@@ -17,10 +17,14 @@ Jeweler::Tasks.new do |gem|
   gem.name = "json_extractor"
   gem.homepage = "http://github.com/bradhe/json_extractor"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Tools for extracting JSON without having to deserialize it.}
+  gem.description = %Q{A set of C extensions that can extract specific keys from a JSON document. Right now, only supports extracting subdocuments.}
+  gem.extensions = %w(ext/json_extractor/extconf.rb)
   gem.email = "brad@cloudability.com"
   gem.authors = ["Brad Heller"]
+  gem.extensions = ['ext/json_extractor/extconf.rb']
+  gem.files = Dir.glob('lib/**/*.rb') +
+              Dir.glob('ext/**/*.{c,h,rb}')
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -32,22 +36,16 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
-end
-
 task :default => :test
 
-require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+require 'rake/extensiontask'
+Rake::ExtensionTask.new('json_extractor') do |ext|
+  ext.lib_dir = 'lib/json_extractor'
+end
 
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "json_extractor #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+task :irb => [:compile] do
+  ARGV.clear
+  require File.expand_path('../lib/json_extractor', __FILE__)
+  require 'irb'
+  IRB.start
 end

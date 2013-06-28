@@ -8,11 +8,13 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 require 'test/unit'
-require 'shoulda'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'json_extractor'
 
 class Test::Unit::TestCase
+  def fixture_path(filename)
+    File.expand_path(File.join("..", "fixtures", "#{filename}.json"), __FILE__)
+  end
 end
