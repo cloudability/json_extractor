@@ -100,19 +100,18 @@ unsigned int object_body(char * str, long len, unsigned int pos) {
  * @return [unsigned int] the end of the object.
  */
 unsigned int object(char * str, long len, unsigned int pos) {
-  while(pos < len) {
-    if(str[pos] != '{') {
-      // This is an error--we should tell someone, me thinks.
-      return -1;
-    }
-
-    pos = object_body(str, len, pos+1);
-
-    if(str[pos+1] == '}') {
-      return pos+1;
-    }
+  if(str[pos] != '{') {
+    // This is an error--we should tell someone, me thinks.
+    return -1;
   }
 
+  pos = object_body(str, len, pos+1);
+
+  if(str[pos+1] == '}') {
+    return pos+1;
+  }
+
+  // Something else went wrong.
   return(-1);
 }
 
@@ -128,10 +127,10 @@ unsigned int start(char * str, long len, unsigned int pos) {
   pos = whitespace(str, len, pos);
 
   if(str[pos] == '{') {
-    pos = object(str, len, pos);
+    return object(str, len, pos);
   }
 
-  return pos;
+  return -1;
 }
 
 int find_subdocument(char * str, unsigned int pos) {
@@ -165,15 +164,15 @@ char * extract_subdocument(char * data, const char * key) {
   end = find_subdocument(&pos[strlen(full_key)], 0);
 
   if(end < 0) {
-    free(full_key);
-    return NULL;
+    final = NULL;
+  } else {
+    // Since we get a position, it's actually off by one from the original
+    // position.
+    final = malloc(end+2);
+    memset(final, '\0', end+2);
+    memcpy(final, &pos[strlen(full_key)], end+1);
   }
 
-  final = malloc(end+2);
-  memset(final, '\0', end+2);
-  memcpy(final, &pos[strlen(full_key)], end+1);
-
-  // Done with that...
   free(full_key);
 
   return final;
@@ -183,10 +182,12 @@ static VALUE rb_extract_subdocument(VALUE self, VALUE str, VALUE key) {
   char *data, *substr;
   VALUE result;
 
+  // No str?
   if(str == Qnil) {
     return Qnil;
   }
 
+  // No key?
   if(key == Qnil) {
     return Qnil;
   }
@@ -201,6 +202,8 @@ static VALUE rb_extract_subdocument(VALUE self, VALUE str, VALUE key) {
 
   result = rb_str_new2(substr);
 
+  // TODO: Figure out if this is right. It behaves properly, so I'm assuming
+  // it's OK.
   free(substr);
 
   return result;
