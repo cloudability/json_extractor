@@ -178,6 +178,17 @@ char * extract_subdocument(char * data, const char * key) {
   return final;
 }
 
+int file_exists(char * filename) {
+  FILE * fp;
+
+  if(fp = fopen(filename, "r")) {
+    fclose(fp);
+    return 1;
+  }
+
+  return 0;
+}
+
 static VALUE rb_extract_subdocument(VALUE self, VALUE str, VALUE key) {
   char *data, *substr;
   VALUE result;
@@ -192,9 +203,14 @@ static VALUE rb_extract_subdocument(VALUE self, VALUE str, VALUE key) {
     return Qnil;
   }
 
-  data = read_all(RSTRING_PTR(str));
-  substr = extract_subdocument(data, RSTRING_PTR(key));
-  free(data);
+  // If str points to a file, let's read it and use that. Otherwise...
+  if(file_exists(RSTRING_PTR(str))) {
+    data = read_all(RSTRING_PTR(str));
+    substr = extract_subdocument(data, RSTRING_PTR(key));
+    free(data);
+  } else {
+    substr = extract_subdocument(RSTRING_PTR(str), RSTRING_PTR(key));
+  }
 
   if(substr == NULL) {
     return Qnil;

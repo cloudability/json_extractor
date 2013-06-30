@@ -39,4 +39,10 @@ class TestJsonExtractor < Test::Unit::TestCase
     extracted = extract_from("bad_document", "some_key")
     assert(extracted.nil?, "expected result to be nil but was #{extracted.inspect}")
   end
+
+  def test_extracts_from_json_string_passed_in
+    json = File.read(fixture_path("extra_nested_document"))
+    extracted = JSONExtractor.extract_subdocument(json, "some_key")
+    assert(extracted =~ /\s*{\s+"my_key":\s+{\s+"my_other_key":\s+{\s+"something": 1\s+}\s+}\s+}/, "extracted #{extracted.inspect}")
+  end
 end
