@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/bradhe/json_extractor"
   gem.license = "MIT"
   gem.summary = %Q{Tools for extracting JSON without having to deserialize it.}
-  gem.description = %Q{A set of C extensions that can extract specific keys from a JSON document. Right now, only supports extracting subdocuments.}
+  gem.description = %Q{A set of C extensions that can extract specific keys from a JSON document. Right now, only supports extracting objects.}
   gem.extensions = %w(ext/json_extractor/extconf.rb)
   gem.email = "brad@cloudability.com"
   gem.authors = ["Brad Heller"]
