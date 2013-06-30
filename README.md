@@ -3,6 +3,9 @@
 Pull out specific objects from a large JSON document by key without having to
 deserialize the whole object in to Ruby.
 
+**NOTE:** This gem only supports extracting objects from JSON documents.
+Strings, numbers, and arrays are not supported. Yet.
+
 ## Example
 
 Assume that you have a JSON document:
