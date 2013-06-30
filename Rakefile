@@ -49,3 +49,7 @@ task :irb => [:compile] do
   require 'irb'
   IRB.start
 end
+
+Dir[File.expand_path('../lib/tasks/**/*.rake', __FILE__)].each do |file|
+  load file
+end
