@@ -50,3 +50,6 @@ pkg
 
 # For Vim droppings
 *.sw[onp]
+
+# For ruby extensions
+*.bundle
