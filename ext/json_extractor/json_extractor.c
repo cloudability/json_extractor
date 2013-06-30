@@ -7,6 +7,8 @@
 
 PARSER_FUNC(object);
 PARSER_FUNC(object_body);
+PARSER_FUNC(array);
+PARSER_FUNC(array_body);
 PARSER_FUNC(start);
 PARSER_FUNC(whitespace);
 
@@ -116,6 +118,52 @@ unsigned int object(char * str, long len, unsigned int pos) {
 }
 
 /**
+ * Finds the end of the current array body that is under pos within str.
+ *
+ * @param [char *] str the string to search.
+ * @param [long] len the overall length of the string.
+ * @param [unsigned int] pos the initial position (i.e. where to start)
+ * @return [unsigned int] the end of the array body.
+ */
+unsigned int array_body(char * str, long len, unsigned int pos) {
+  while(pos < len) {
+    if(str[pos+1] == '[') {
+      pos = array(str, len, pos+1);
+    }
+
+    if(str[pos+1] == ']') {
+      return pos;
+    }
+
+    pos++;
+  }
+
+  return -1;
+}
+
+/**
+ * Finds the end of the current array that is under pos within str.
+ *
+ * @param [char *] str the string to search.
+ * @param [long] len the overall length of the string.
+ * @param [unsigned int] pos the initial position (i.e. where to start)
+ * @return [unsigned int] the end of the array.
+ */
+unsigned int array(char * str, long len, unsigned int pos) {
+  if(str[pos] != '[') {
+    return -1;
+  }
+
+  pos = array_body(str, len, pos);
+
+  if(str[pos+1] == ']') {
+    return pos+1;
+  }
+
+  return -1;
+}
+
+/**
  * Starts parsing.
  *
  * @param [char *] str the string to search.
@@ -128,6 +176,8 @@ unsigned int start(char * str, long len, unsigned int pos) {
 
   if(str[pos] == '{') {
     return object(str, len, pos);
+  } else if(str[pos] == '[') {
+    return array(str, len, pos);
   }
 
   return -1;

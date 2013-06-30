@@ -30,11 +30,6 @@ class TestJsonExtractor < Test::Unit::TestCase
     assert(extracted.nil?, "expected result to be nil")
   end
 
-  def test_returns_nil_when_trying_to_extract_array
-    extracted = extract_from("array_document", "some_key")
-    assert(extracted.nil?, "expected result to be nil but was #{extracted.inspect}")
-  end
-
   def test_returns_nil_when_document_is_not_formatted_properly
     extracted = extract_from("bad_document", "some_key")
     assert(extracted.nil?, "expected result to be nil but was #{extracted.inspect}")
@@ -44,5 +39,27 @@ class TestJsonExtractor < Test::Unit::TestCase
     json = File.read(fixture_path("extra_nested_document"))
     extracted = JSONExtractor.extract_subdocument(json, "some_key")
     assert(extracted =~ /\s*{\s+"my_key":\s+{\s+"my_other_key":\s+{\s+"something": 1\s+}\s+}\s+}/, "extracted #{extracted.inspect}")
+  end
+
+  def test_extracts_arrays
+    extracted = extract_from("basic_array_document", "some_key")
+    assert(extracted == " [1,2,3,4,5]", "extracted #{extracted.inspect}")
+  end
+
+  def test_extracts_arrays_even_when_nested
+    extracted = extract_from("nested_array_document", "some_key")
+    assert(!extracted.nil?, "extracted #{extracted.inspect}")
+  end
+
+  def test_creates_subdocuments_from_arrays
+    assert_nothing_raised do
+      JSONExtractor.subdocument(fixture_path("nested_array_document"), "some_key")
+    end
+  end
+
+  def test_creates_subdocuments_from_objects
+    assert_nothing_raised do
+      JSONExtractor.subdocument(fixture_path("simple_document"), "my_key")
+    end
   end
 end
