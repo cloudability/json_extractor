@@ -53,3 +53,4 @@ pkg
 
 # For ruby extensions
 *.bundle
+/tmp
